@@ -77,11 +77,19 @@ $.fn.make2048 = function(option){
     }
     
 
-    var getCoordinate = function(index){
+    var getCoordinate = function(index){//得到坐标
         return{
             x:index % option.width,
             y:Math.floor(index / option.width),
         }
+    }
+
+    var getIndex = function(x,y){
+        return x + y * option.width;
+    }
+
+    var getBlock = function(x,y){
+        return state[getIndex(x,y)]
     }
 
     var getEmptyBlockIndexs = function(){
@@ -92,14 +100,23 @@ $.fn.make2048 = function(option){
         return emptyBlockIndexs;
     }
 
-    var buildBlock = function(){
+    var buildBlock = function(level,x,y){
         var emptyBlockIndexs = getEmptyBlockIndexs();
         if(emptyBlockIndexs.length == 0) return false;
         
         var putIndex;
-        putIndex = emptyBlockIndexs[Math.floor(Math.random() * emptyBlockIndexs.length)];
+        if(x != undefined && y != undefined){
+            putIndex = getIndex(x,y);
+        }else{
+            putIndex = emptyBlockIndexs[Math.floor(Math.random() * emptyBlockIndexs.length)];//生成一个正确的随机空格
+        }
 
-        var block = Math.random() >=0.5 ? option.blocks[0] : option.blocks[1];
+        var block;
+        if(level != undefined){
+            block = $.extend({},option.blocks[level]);
+        }else{
+            block = $.extend({},Math.random() >=0.5 ? option.blocks[0] : option.blocks[1]);
+        }
 
         var coordinate = getCoordinate(putIndex);
         var position = getPosition(coordinate.x,coordinate.y);
@@ -122,15 +139,51 @@ $.fn.make2048 = function(option){
             "line-height":option.style.block_size + "px",
             "top":position.top,
             "left":position.left,
-        },option.animateSpeed,function(){
-            blockDom.html(block.value);
-        })
+        },option.animateSpeed,(function(blockDom){
+            return function(){
+                blockDom.html(block.value);
+            }
+        })(blockDom))
 
         return true;
     }
+
+    var move = function(direction){
+        switch(direction){
+            case "up":
+                for(var x = 0;x < option.width;x++){
+                    for(var y = 1;y < option.height;y++){
+                        var block = getBlock(x,y);
+                        if(block == null) continue;
+
+                        var target_coordinate = {x:x,y:y-1};
+                        var target_block = getBlock(target_coordinate.x,target_coordinate.y);
+                        var moved = 0;
+                        while(target_coordinate.y > 0 && target_block == null){
+                            target_coordinate.y = target_coordinate.y - 1;
+                            target_block = getBlock(target_coordinate.x,target_coordinate.y);
+                            if(++moved > Math.max(option.width,option.height)) break;
+                        }
+
+                        
+                    }
+                }
+                break;
+            case "down":
+                break;
+            case "left":
+                break;
+            case "right":
+                break;
+        }
+    }
     buildBackground();
-    buildBlock();
-    buildBlock();
+    buildBlock(0,0,0);
+    buildBlock(1,1,1);
+    buildBlock(2,2,1);
+    buildBlock(3,3,1);
+    buildBlock(4,1,3);
+    buildBlock(5,1,2);
    
 
 }
