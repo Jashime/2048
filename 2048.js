@@ -153,19 +153,37 @@ $.fn.make2048 = function(option){
 
     var move = function(direction){
         switch(direction){
+            //向上操作
             case "up":
                 for(var x = 0;x < option.width;x++){
-                    for(var y = 1;y < option.height;y++){//第二排开始遍历
+                    for(var y = 1;y < option.height;y++){//从第二排开始遍历
                         var block = getBlock(x,y);
                         if(block == null) continue;
-
-                        var target_coordinate = {x:x,y:y-1};
+                        block.justModified = false;
+                        var target_coordinate = {x:x,y:y-1};//拿到上一个坐标
                         var target_block = getBlock(target_coordinate.x,target_coordinate.y);
-                        var moved = 0;
+                        var blockDom = $(".block_" + x + "_" + y);
+                        var moved = false;
                         while(target_coordinate.y > 0 && target_block == null){
                             target_coordinate.y = target_coordinate.y - 1;
                             target_block = getBlock(target_coordinate.x,target_coordinate.y);
-                            if(++moved > Math.max(option.width,option.height)) break;
+                            //if(++moved > Math.max(option.width,option.height)) break;//避免死循环跳出循环
+                        }
+                        if(target_block == null){
+                            var position = getPosition(target_coordinate.x,target_coordinate.y);
+                            state[getIndex(x,y)] = null;
+                            state[getIndex(target_coordinate.x, target_coordinate.y)] = block;
+                            blockDom.removeClass();
+                            blockDom.addClass("block_" + target_coordinate.x + "_" + target_coordinate.y);
+                            blockDom.animate({
+                                "top": position.top,
+                                "left": position.left
+                              }, option.animateSpeed)
+                        }else if(target_block.value == block.value){
+                            var position = getPosition(target_coordinate.x, target_coordinate.y);
+                            var updatedBlock = $.extend({}, option.blocks[block.level + 1]);
+                        }else{
+
                         }
 
                         
