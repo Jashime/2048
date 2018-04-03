@@ -39,27 +39,29 @@ $.fn.make2048 = function(option){
 
     
     var $this = $(this[0]);
+
+    //设置最外层背景
     $this.css({
         "background-color":option.style.background_color,
         "border-radius":option.style.padding,
         "position":"relative",
         "-webkit-user-select":"none"
     })
-
+    //创建游戏块位置的方法
     var getPosition = function(x,y){
         return{
             "top":option.style.padding + y * (option.style.block_size + option.style.padding),
             "left":option.style.padding + x * (option.style.block_size + option.style.padding)
         }
     }
-
+    //创建游戏移动块
     var buildBackground = function(){
         var backgrounds = [];
         for(var x = 0;x<option.width;x++){
             for(var y = 0;y<option.height;y++){
                 state.push(null);
                 var bg_block = $("<div></div>");
-                var position =getPosition(x,y);
+                var position = getPosition(x,y);
                 bg_block.css({
                     "width":option.style.block_size,
                     "height":option.style.block_size,
@@ -111,6 +113,7 @@ $.fn.make2048 = function(option){
             putIndex = emptyBlockIndexs[Math.floor(Math.random() * emptyBlockIndexs.length)];//生成一个正确的随机空格
         }
 
+        //重载
         var block;
         if(level != undefined){
             block = $.extend({},option.blocks[level]);
@@ -131,7 +134,7 @@ $.fn.make2048 = function(option){
         },block.style));
 
         $this.append(blockDom);
-        state[putIndex] = block;
+        state[putIndex] = block;//游戏数据，已经出现在游戏界面里的块
 
         blockDom.animate({
             "width":option.style.block_size,
@@ -152,7 +155,7 @@ $.fn.make2048 = function(option){
         switch(direction){
             case "up":
                 for(var x = 0;x < option.width;x++){
-                    for(var y = 1;y < option.height;y++){
+                    for(var y = 1;y < option.height;y++){//第二排开始遍历
                         var block = getBlock(x,y);
                         if(block == null) continue;
 
